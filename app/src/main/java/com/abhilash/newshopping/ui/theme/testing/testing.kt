@@ -2,7 +2,6 @@ package com.abhilash.newshopping.ui.theme.testing
 
 
 import android.widget.Toast
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -33,7 +32,6 @@ import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DrawerValue
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -223,10 +221,10 @@ val context = LocalContext.current
                                             .height(150.dp)
                                     ) {
                                         Spacer(modifier = Modifier.height(2.dp))
-                                        Text(text = newtext, fontSize = 16.sp,
-                                            modifier = Modifier.padding(start = 10.dp),
-                                            color = Color.White)
-
+                                        Text(newtext,fontSize = 20.sp,color = Color.White,
+                                            modifier = Modifier.padding(start=10.dp).clickable {
+                                                Toast.makeText(context, "List Name", Toast.LENGTH_SHORT).show()
+                                            })
                                     }
                                 }
                             }
@@ -415,11 +413,6 @@ val context = LocalContext.current
                             backgroundColor = Color(0xFF0A134D),
                             contentColor = Color.White,
                             elevation = 8.dp
-//                           contentColor = topAppBarColors(
-//                                containerColor = Color(0xFF3A468F),
-//                                titleContentColor = Color.White,
-//                                navigationIconContentColor = Color.White
-//                            )
                         )
                     },
                     content = { paddingValues ->
@@ -430,7 +423,11 @@ val context = LocalContext.current
                                 .padding(paddingValues)
                         ) {
                             Column {
-                                Text(newtext,fontSize = 20.sp,color = Color.White,modifier = Modifier.padding(start=10.dp))
+                                Text(newtext,fontSize = 20.sp,color = Color.White,
+                                    modifier = Modifier.padding(start=10.dp).clickable {
+                                        Toast.makeText(context, "List Name", Toast.LENGTH_SHORT).show()
+                                    }
+                                )
 
 
 
