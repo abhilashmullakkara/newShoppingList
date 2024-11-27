@@ -54,11 +54,18 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import com.abhilash.newshopping.ui.theme.components.Navigation
 import kotlinx.coroutines.launch
 
+@Composable
+fun MyApp(){
+    Navigation()
+   // DrawerWithScaffold(navController = NavController(LocalContext.current))
+}
 
 @Composable
-fun DrawerWithScaffold() {
+fun DrawerWithScaffold(navController: NavController) {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     var newtext by remember { mutableStateOf("") }
      val bottomSheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden)
@@ -222,9 +229,17 @@ val context = LocalContext.current
                                     ) {
                                         Spacer(modifier = Modifier.height(2.dp))
                                         Text(newtext,fontSize = 20.sp,color = Color.White,
-                                            modifier = Modifier.padding(start=10.dp).clickable {
-                                                Toast.makeText(context, "List Name", Toast.LENGTH_SHORT).show()
-                                            })
+                                            modifier = Modifier
+                                                .padding(start = 10.dp)
+                                                .clickable {
+                                                    Toast
+                                                        .makeText(
+                                                            context,
+                                                            "List Name",
+                                                            Toast.LENGTH_SHORT
+                                                        )
+                                                        .show()
+                                                })
                                     }
                                 }
                             }
@@ -424,9 +439,14 @@ val context = LocalContext.current
                         ) {
                             Column {
                                 Text(newtext,fontSize = 20.sp,color = Color.White,
-                                    modifier = Modifier.padding(start=10.dp).clickable {
-                                        Toast.makeText(context, "List Name", Toast.LENGTH_SHORT).show()
-                                    }
+                                    modifier = Modifier
+                                        .padding(start = 10.dp)
+                                        .clickable {
+                                            navigateToDynamicScreen(navController, newtext)
+                                            Toast
+                                                .makeText(context, "List Name", Toast.LENGTH_SHORT)
+                                                .show()
+                                        }
                                 )
 
 
@@ -442,6 +462,11 @@ val context = LocalContext.current
             }
         }
     }
+}
+
+
+fun navigateToDynamicScreen(navController: NavController, userInput: String) {
+    navController.navigate("DynamicScreen/$userInput")
 }
 
 

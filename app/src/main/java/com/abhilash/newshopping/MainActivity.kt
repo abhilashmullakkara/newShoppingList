@@ -12,6 +12,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.abhilash.newshopping.ui.theme.NewShoppingTheme
 import com.abhilash.newshopping.ui.theme.temp.IndependentDrawers
 import com.abhilash.newshopping.ui.theme.testing.DrawerWithScaffold
+import com.abhilash.newshopping.ui.theme.testing.MyApp
 import com.google.android.gms.ads.MobileAds
 
 class MainActivity : ComponentActivity() {
@@ -22,8 +23,9 @@ class MainActivity : ComponentActivity() {
         MobileAds.initialize(this) {}
         setContent {
             NewShoppingTheme {
+                MyApp()
                // BannerAdView()
-                DrawerWithScaffold()
+             //   DrawerWithScaffold()
                // IndependentDrawers()
             }
         }
