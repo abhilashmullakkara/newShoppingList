@@ -1,6 +1,7 @@
 package com.abhilash.newshopping.ui.theme.testing
 
 
+import android.net.Uri
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -56,6 +57,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.abhilash.newshopping.ui.theme.components.Navigation
+import com.abhilash.newshopping.ui.theme.components.saveToFile
 import kotlinx.coroutines.launch
 
 @Composable
@@ -66,6 +68,9 @@ fun MyApp(){
 
 @Composable
 fun DrawerWithScaffold(navController: NavController) {
+    var inputText by remember { mutableStateOf("") }
+    var fileContent by remember { mutableStateOf("") }
+    var fileUri by remember { mutableStateOf<Uri?>(null) }
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     var newtext by remember { mutableStateOf("") }
      val bottomSheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden)
@@ -73,12 +78,13 @@ fun DrawerWithScaffold(navController: NavController) {
 
     val screenWidth = LocalConfiguration.current.screenWidthDp.dp
 val context = LocalContext.current
+    fileUri = saveToFile(context, "data.txt")
     // Function to show the bottom sheet
-    fun showBottomDrawer() {
-        coroutineScope.launch {
-            bottomSheetState.show()
-        }
-    }
+//    fun showBottomDrawer() {
+//        coroutineScope.launch {
+//            bottomSheetState.show()
+//        }
+//    }
 
     // Main content layout wrapped in ModalBottomSheetLayout
     ModalBottomSheetLayout(
@@ -410,7 +416,7 @@ val context = LocalContext.current
                 Scaffold(
                     topBar = {
                         TopAppBar(
-                            title = { Text("Shopping List") },
+                            title = { Text("Shopping List",color = Color.White, style = MaterialTheme.typography.titleLarge) },
                             navigationIcon = {
                                 IconButton(onClick = {
                                     coroutineScope.launch {

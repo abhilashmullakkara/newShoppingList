@@ -16,7 +16,7 @@ fun Navigation() {
         }
         composable("DynamicScreen/{userInput}") { backStackEntry ->
             val userInput = backStackEntry.arguments?.getString("userInput") ?: "Default"
-            DynamicScreen(userInput = userInput)
+            DynamicScreen(userInput = userInput,navController)
         }
 
     }
