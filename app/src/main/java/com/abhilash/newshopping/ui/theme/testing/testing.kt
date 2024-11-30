@@ -1,7 +1,6 @@
 package com.abhilash.newshopping.ui.theme.testing
 
 
-import android.net.Uri
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -57,7 +56,6 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.room.Room
@@ -66,7 +64,6 @@ import com.abhilash.newshopping.ui.theme.components.Navigation
 import com.abhilash.newshopping.ui.theme.components.ShopRepository
 import com.abhilash.newshopping.ui.theme.components.ShopViewModel
 import com.abhilash.newshopping.ui.theme.components.ShopViewModelFactory
-import com.abhilash.newshopping.ui.theme.components.saveToFile
 import kotlinx.coroutines.launch
 
 @Composable
@@ -109,7 +106,7 @@ fun DrawerWithScaffold(navController: NavController) {
             // Bottom drawer content0xFF0E0F14
             Surface(modifier = Modifier.fillMaxSize(),color=Color(0xFF0A134D)) {
                 var text by remember { mutableStateOf("") }
-
+                if (drawerState.isClosed)newtext = ""
                 Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -124,10 +121,12 @@ fun DrawerWithScaffold(navController: NavController) {
                         )
                         Button(onClick = {
                             newtext = text
+                            shopViewModel.insertShop(text)
                             if(newtext.isNotEmpty())
                             coroutineScope.launch { bottomSheetState.hide()
 
                                 text = ""
+                                //newtext = ""
                             }
                             else
                                 Toast.makeText(context, "Please enter a name", Toast.LENGTH_SHORT).show()
@@ -154,7 +153,7 @@ fun DrawerWithScaffold(navController: NavController) {
                         ),
                         modifier = Modifier.fillMaxWidth()
                     )
-                    shopViewModel.insertShop(text)
+
                     //viewModel.getdatabase(context).insertShop(newtext)
             }
         }
@@ -230,7 +229,7 @@ fun DrawerWithScaffold(navController: NavController) {
                                         }
                                         HorizontalDivider()
                                         Spacer(modifier = Modifier.height(10.dp))
-                                        Text("   $newtext", fontSize = 16.sp, color = Color.White)
+                                       // Text("   $newtext", fontSize = 16.sp, color = Color.White)
                                     }
                                 }
                             }
@@ -462,16 +461,6 @@ fun DrawerWithScaffold(navController: NavController) {
                                 .padding(paddingValues)
                         ) {
                             Column {
-                                Text(newtext,fontSize = 20.sp,color = Color.White,
-                                    modifier = Modifier
-                                        .padding(start = 10.dp)
-                                        .clickable {
-                                            navigateToDynamicScreen(navController, newtext)
-                                            Toast
-                                                .makeText(context, "List Name", Toast.LENGTH_SHORT)
-                                                .show()
-                                        }
-                                )
                                 LazyColumn(modifier = Modifier.fillMaxSize().padding(16.dp)) {
                                     items(shopList) { shop ->
                                         Text(
@@ -479,8 +468,11 @@ fun DrawerWithScaffold(navController: NavController) {
                                             color = Color.White,
                                             style = MaterialTheme.typography.titleMedium,
                                             //modifier = Modifier.padding(vertical = 8.dp)
-                                            modifier = Modifier.padding(top=6.dp).clickable{
-                                                navigateToDynamicScreen(navController, shop.shopName)
+                                            modifier = Modifier.padding(top=6.dp).clickable {
+                                                navigateToDynamicScreen(
+                                                    navController,
+                                                    shop.shopName
+                                                )
                                             }
                                         )
                                     }

@@ -40,61 +40,62 @@ class ShopRepository(private val shopDao: ShopDao) {
     // LiveData to observe the list of all shops
     val shopList: LiveData<List<ShopEntity>> = shopDao.getAllShops()
 }
-class ShopViewModel(private val repository: ShopRepository) : ViewModel() {
 
-    // Add a new item
-    fun addItem(item: ItemEntity) {
-        viewModelScope.launch {
-            repository.addItem(item)
-        }
-    }
-
-    // Remove a single item
-    fun removeItem(item: ItemEntity) {
-        viewModelScope.launch {
-            repository.removeItem(item)
-        }
-    }
-
-    fun removeItemById(itemId: Int) {
-        viewModelScope.launch {
-            repository.removeItemById(itemId)
-        }
-    }
-
-    fun removeItemByName(itemName: String) {
-        viewModelScope.launch {
-            repository.removeItemByName(itemName)
-        }
-    }
-
-    // Remove all items
-    fun clearAllItems() {
-        viewModelScope.launch {
-            repository.clearAllItems()
-        }
-    }
-    fun insertShop(shopName: String) {
-        viewModelScope.launch {
-            repository.addShop(shopName)
-        }
-    }
-}
-
-
-//
 //class ShopViewModel(private val repository: ShopRepository) : ViewModel() {
 //
-//    // Use the shopList from the repository directly
-//    val shopList: LiveData<List<ShopEntity>> = repository.shopList
+//    // Add a new item
+//    fun addItem(item: ItemEntity) {
+//        viewModelScope.launch {
+//            repository.addItem(item)
+//        }
+//    }
 //
-//    // Function to insert a new shop
+//    // Remove a single item
+//    fun removeItem(item: ItemEntity) {
+//        viewModelScope.launch {
+//            repository.removeItem(item)
+//        }
+//    }
+//
+//    fun removeItemById(itemId: Int) {
+//        viewModelScope.launch {
+//            repository.removeItemById(itemId)
+//        }
+//    }
+//
+//    fun removeItemByName(itemName: String) {
+//        viewModelScope.launch {
+//            repository.removeItemByName(itemName)
+//        }
+//    }
+//
+//    // Remove all items
+//    fun clearAllItems() {
+//        viewModelScope.launch {
+//            repository.clearAllItems()
+//        }
+//    }
 //    fun insertShop(shopName: String) {
 //        viewModelScope.launch {
 //            repository.addShop(shopName)
 //        }
 //    }
 //}
+
+
+
+class ShopViewModel(private val repository: ShopRepository) : ViewModel() {
+
+    // Use the shopList from the repository directly
+    val shopList: LiveData<List<ShopEntity>> = repository.shopList
+
+    // Function to insert a new shop
+    fun insertShop(shopName: String) {
+        viewModelScope.launch {
+            repository.addShop(shopName)
+        }
+    }
+}
 
 
 

@@ -41,10 +41,11 @@ data class ShopEntity(
 )
 data class ItemEntity(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
-    val shopId: Int,   // Foreign key linking to ShopEntity
-    val name: String,
-    val quantity: Int? = null
+    val shopId: Int, // Foreign key to associate with ShopEntity
+    val itemName: String,
+    val itemQuantity: String
 )
+
 
 @Dao
 interface ShopDao {
@@ -68,7 +69,7 @@ interface ShopDao {
     @Query("DELETE FROM ItemEntity WHERE id = :itemId")
     suspend fun deleteItemById(itemId: Int)
 
-    @Query("DELETE FROM ItemEntity WHERE name = :itemName")
+    @Query("DELETE FROM ItemEntity WHERE itemName = :itemName")
     suspend fun deleteItemByName(itemName: String)
     @Query("DELETE FROM ItemEntity")
     suspend fun deleteAllItems()
@@ -85,6 +86,8 @@ interface ItemDao {
     @Query("SELECT * FROM ItemEntity")
     fun getAllItems(): LiveData<List<ItemEntity>>
 }
+
+
 
 
 data class ShopWithItems(
