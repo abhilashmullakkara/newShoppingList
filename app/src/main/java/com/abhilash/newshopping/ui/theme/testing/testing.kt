@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Button
 import androidx.compose.material.ModalBottomSheetLayout
 import androidx.compose.material.ModalBottomSheetValue
@@ -43,6 +44,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -55,8 +57,15 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import androidx.room.Room
+import com.abhilash.newshopping.ui.theme.components.AppDatabase
 import com.abhilash.newshopping.ui.theme.components.Navigation
+import com.abhilash.newshopping.ui.theme.components.ShopRepository
+import com.abhilash.newshopping.ui.theme.components.ShopViewModel
+import com.abhilash.newshopping.ui.theme.components.ShopViewModelFactory
 import com.abhilash.newshopping.ui.theme.components.saveToFile
 import kotlinx.coroutines.launch
 
@@ -68,23 +77,30 @@ fun MyApp(){
 
 @Composable
 fun DrawerWithScaffold(navController: NavController) {
-    var inputText by remember { mutableStateOf("") }
-    var fileContent by remember { mutableStateOf("") }
-    var fileUri by remember { mutableStateOf<Uri?>(null) }
+    val context = LocalContext.current
+    val shopDao = AppDatabase.getDatabase(context).shopDao()
+    val shopRepository = remember { ShopRepository(shopDao) }
+    val shopViewModel = remember { ShopViewModel(shopRepository) }
+
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     var newtext by remember { mutableStateOf("") }
      val bottomSheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden)
     val coroutineScope = rememberCoroutineScope()
-
     val screenWidth = LocalConfiguration.current.screenWidthDp.dp
-val context = LocalContext.current
-    fileUri = saveToFile(context, "data.txt")
-    // Function to show the bottom sheet
-//    fun showBottomDrawer() {
-//        coroutineScope.launch {
-//            bottomSheetState.show()
-//        }
-//    }
+    val repository = ShopRepository(shopDao)
+
+    val database = remember {
+        Room.databaseBuilder(
+            context,
+            AppDatabase::class.java,
+            "shop-database"
+        ).build()
+    }
+    //val repository = remember { ShopRepository(database.shopDao()) }
+    val viewModel: ShopViewModel = viewModel(
+        factory = ShopViewModelFactory(repository)
+    )
+    val shopList by viewModel.shopList.observeAsState(emptyList())
 
     // Main content layout wrapped in ModalBottomSheetLayout
     ModalBottomSheetLayout(
@@ -138,6 +154,8 @@ val context = LocalContext.current
                         ),
                         modifier = Modifier.fillMaxWidth()
                     )
+                    shopViewModel.insertShop(text)
+                    //viewModel.getdatabase(context).insertShop(newtext)
             }
         }
         }
@@ -454,7 +472,19 @@ val context = LocalContext.current
                                                 .show()
                                         }
                                 )
-
+                                LazyColumn(modifier = Modifier.fillMaxSize().padding(16.dp)) {
+                                    items(shopList) { shop ->
+                                        Text(
+                                            text = shop.shopName,
+                                            color = Color.White,
+                                            style = MaterialTheme.typography.titleMedium,
+                                            //modifier = Modifier.padding(vertical = 8.dp)
+                                            modifier = Modifier.padding(top=6.dp).clickable{
+                                                navigateToDynamicScreen(navController, shop.shopName)
+                                            }
+                                        )
+                                    }
+                                }
 
 
 

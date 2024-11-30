@@ -59,6 +59,7 @@ android {
 dependencies {
     //Room
     implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.runtime.livedata)
     ksp(libs.androidx.room.compiler)
     implementation(libs.androidx.room.ktx)
     implementation(libs.androidx.room.guava)
