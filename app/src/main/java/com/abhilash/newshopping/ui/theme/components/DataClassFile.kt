@@ -49,6 +49,9 @@ data class ItemEntity(
 
 @Dao
 interface ShopDao {
+    @Transaction
+    @Query("DELETE FROM ShopEntity WHERE id = :shopId")
+    suspend fun deleteShopById(shopId: Int)
     @Insert
     suspend fun insertShop(shop: ShopEntity): Long
 
@@ -107,3 +110,5 @@ class ShopViewModelFactory(private val repository: ShopRepository) : ViewModelPr
         throw IllegalArgumentException("Unknown ViewModel class")
     }
 }
+
+

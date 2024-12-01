@@ -12,7 +12,9 @@ class ShopRepository(private val shopDao: ShopDao) {
         val shop = ShopEntity(shopName = shopName)
         return shopDao.insertShop(shop)
     }
-
+    suspend fun deleteShopById(shopId: Int) {
+        shopDao.deleteShopById(shopId)
+    }
 
     // Add a new item
     suspend fun addItem(item: ItemEntity) {
@@ -93,6 +95,12 @@ class ShopViewModel(private val repository: ShopRepository) : ViewModel() {
     fun insertShop(shopName: String) {
         viewModelScope.launch {
             repository.addShop(shopName)
+        }
+    }
+
+    fun deleteShopById(shopId: Int) {
+        viewModelScope.launch {
+            repository.deleteShopById(shopId)
         }
     }
 }

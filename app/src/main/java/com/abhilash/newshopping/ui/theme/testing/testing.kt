@@ -4,6 +4,7 @@ package com.abhilash.newshopping.ui.theme.testing
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -15,7 +16,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
+import androidx.compose.material.Checkbox
+import androidx.compose.material.CheckboxDefaults
 import androidx.compose.material.ModalBottomSheetLayout
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.OutlinedTextField
@@ -30,6 +34,7 @@ import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.outlined.AccountBalanceWallet
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.rememberModalBottomSheetState
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DrawerValue
@@ -40,10 +45,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Surface
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -58,7 +66,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import androidx.room.Room
 import com.abhilash.newshopping.ui.theme.components.AppDatabase
 import com.abhilash.newshopping.ui.theme.components.Navigation
 import com.abhilash.newshopping.ui.theme.components.ShopRepository
@@ -69,36 +76,26 @@ import kotlinx.coroutines.launch
 @Composable
 fun MyApp(){
     Navigation()
-   // DrawerWithScaffold(navController = NavController(LocalContext.current))
 }
 
 @Composable
 fun DrawerWithScaffold(navController: NavController) {
+    val checkedStates = remember { mutableStateMapOf<String, Boolean>() }
+    var newtext by remember { mutableStateOf("") }
     val context = LocalContext.current
+    val stringList = remember { mutableStateListOf<String>() } // Persistent list
     val shopDao = AppDatabase.getDatabase(context).shopDao()
     val shopRepository = remember { ShopRepository(shopDao) }
     val shopViewModel = remember { ShopViewModel(shopRepository) }
-
     val drawerState = rememberDrawerState(DrawerValue.Closed)
-    var newtext by remember { mutableStateOf("") }
      val bottomSheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden)
     val coroutineScope = rememberCoroutineScope()
     val screenWidth = LocalConfiguration.current.screenWidthDp.dp
     val repository = ShopRepository(shopDao)
-
-    val database = remember {
-        Room.databaseBuilder(
-            context,
-            AppDatabase::class.java,
-            "shop-database"
-        ).build()
-    }
-    //val repository = remember { ShopRepository(database.shopDao()) }
     val viewModel: ShopViewModel = viewModel(
         factory = ShopViewModelFactory(repository)
     )
     val shopList by viewModel.shopList.observeAsState(emptyList())
-
     // Main content layout wrapped in ModalBottomSheetLayout
     ModalBottomSheetLayout(
         sheetState = bottomSheetState,
@@ -122,11 +119,15 @@ fun DrawerWithScaffold(navController: NavController) {
                         Button(onClick = {
                             newtext = text
                             shopViewModel.insertShop(text)
+                            if (newtext.isNotEmpty()) {
+                                if (!stringList.contains(newtext)) {
+                                    stringList.add(newtext) // Add new item to the list
+                                }
+                            }
                             if(newtext.isNotEmpty())
                             coroutineScope.launch { bottomSheetState.hide()
-
                                 text = ""
-                                //newtext = ""
+                               // newtext = ""
                             }
                             else
                                 Toast.makeText(context, "Please enter a name", Toast.LENGTH_SHORT).show()
@@ -134,14 +135,12 @@ fun DrawerWithScaffold(navController: NavController) {
                             Text("Save List ")
                         }
                     }
-
                     Spacer(modifier = Modifier.height(8.dp))
                     OutlinedTextField(
                         value = text, // Bind the state to the text field
                         onValueChange = { newText -> text = newText }, // Update state on text change
                         label = { Text("List Name ",color = Color(0xFF5C5D74)) },
                         placeholder = { Text("Type here",color = Color(0xFF5C5D74)) },
-
                         colors = TextFieldDefaults.outlinedTextFieldColors(
                             textColor = Color(0xFFFFB300), // Text color when typing
                             focusedBorderColor = Color(0xFF00897B), // Border color when focused
@@ -153,8 +152,6 @@ fun DrawerWithScaffold(navController: NavController) {
                         ),
                         modifier = Modifier.fillMaxWidth()
                     )
-
-                    //viewModel.getdatabase(context).insertShop(newtext)
             }
         }
         }
@@ -251,18 +248,17 @@ fun DrawerWithScaffold(navController: NavController) {
                                             .height(150.dp)
                                     ) {
                                         Spacer(modifier = Modifier.height(2.dp))
-                                        Text(newtext,fontSize = 20.sp,color = Color.White,
-                                            modifier = Modifier
-                                                .padding(start = 10.dp)
-                                                .clickable {
-                                                    Toast
-                                                        .makeText(
-                                                            context,
-                                                            "List Name",
-                                                            Toast.LENGTH_SHORT
-                                                        )
-                                                        .show()
-                                                })
+
+                                        LazyColumn{
+                                            items(stringList) {string->
+                                              Text(string,fontSize = 20.sp,color = Color.White,
+                                                  modifier = Modifier.padding(start = 10.dp)
+
+                                                  )
+                                            }
+
+                                        }
+//
                                     }
                                 }
                             }
@@ -439,8 +435,11 @@ fun DrawerWithScaffold(navController: NavController) {
                                     coroutineScope.launch {
                                         if (drawerState.isClosed) {
                                             drawerState.open()
+
                                         } else {
+                                            navController.popBackStack()
                                             drawerState.close()
+                                            Toast.makeText(context, "PopUpBackStack invoked", Toast.LENGTH_SHORT).show()
                                         }
                                     }
                                 }) {
@@ -461,20 +460,91 @@ fun DrawerWithScaffold(navController: NavController) {
                                 .padding(paddingValues)
                         ) {
                             Column {
-                                LazyColumn(modifier = Modifier.fillMaxSize().padding(16.dp)) {
+                                LazyColumn(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .padding(16.dp),
+                                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                                )
+                                {
                                     items(shopList) { shop ->
-                                        Text(
-                                            text = shop.shopName,
-                                            color = Color.White,
-                                            style = MaterialTheme.typography.titleMedium,
-                                            //modifier = Modifier.padding(vertical = 8.dp)
-                                            modifier = Modifier.padding(top=6.dp).clickable {
-                                                navigateToDynamicScreen(
-                                                    navController,
-                                                    shop.shopName
+
+                                        Card(
+                                            modifier = Modifier.fillMaxWidth(),
+                                            colors = CardDefaults.cardColors(
+                                                containerColor = Color(
+                                                    0xFF1A1B26
                                                 )
+                                            ),
+                                            shape = RoundedCornerShape(8.dp),
+                                            elevation = CardDefaults.cardElevation(4.dp)
+                                        ) {
+                                            var isChecked by remember { mutableStateOf(false) }
+                                            Row(
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .padding(13.dp),
+                                                verticalAlignment = Alignment.CenterVertically,
+                                                horizontalArrangement = Arrangement.SpaceBetween
+                                            )
+                                            {
+                                                Text(
+                                                    text = shop.shopName,
+                                                    color = Color.White,
+                                                    style = MaterialTheme.typography.titleMedium,
+                                                    //modifier = Modifier.padding(vertical = 8.dp)
+                                                    modifier = Modifier
+                                                        .padding(top = 6.dp)
+                                                        .clickable {
+                                                            navigateToDynamicScreen(
+                                                                navController,
+                                                                shop.shopName
+                                                            )
+                                                        }
+                                                )
+
+                                                Checkbox(
+                                                    checked = isChecked,
+                                                    onCheckedChange = {
+                                                        isChecked = it
+                                                        checkedStates[shop.shopName] = it
+                                                    },
+                                                    colors = CheckboxDefaults.colors(
+                                                        checkedColor = Color.Blue,
+                                                        uncheckedColor = Color.White,
+                                                        checkmarkColor = Color.White // Visible tick mark
+                                                    )
+                                                )
+                                                TextButton(
+                                                    onClick = {
+                                                        if (isChecked) {
+                                                            stringList.remove(shop.shopName)
+                                                            shopViewModel.deleteShopById(shop.id)
+                                                            isChecked = false
+                                                        } else {
+                                                            Toast.makeText(
+                                                                context,
+                                                                "Please check the box to delete ${shop.shopName}",
+                                                                Toast.LENGTH_SHORT
+                                                            ).show()
+                                                        }
+
+                                                    },
+                                                    colors = ButtonDefaults.textButtonColors(
+                                                        containerColor = Color(0xFF0A134D),
+                                                        contentColor = Color.White,
+
+                                                        )
+                                                ) {
+                                                    Text(
+                                                        "Delete",
+                                                        color = Color.White,
+                                                        fontSize = MaterialTheme.typography.titleMedium.fontSize
+                                                    )
+
+                                                }
                                             }
-                                        )
+                                        }
                                     }
                                 }
 
@@ -495,6 +565,7 @@ fun DrawerWithScaffold(navController: NavController) {
 
 fun navigateToDynamicScreen(navController: NavController, userInput: String) {
     navController.navigate("DynamicScreen/$userInput")
+   // navController.popBackStack("DynamicScreen/$userInput",inclusive = true)
 }
 
 
