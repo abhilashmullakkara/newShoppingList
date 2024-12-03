@@ -546,13 +546,16 @@ fun DrawerWithScaffold(navController: NavController) {
                                             }
                                         }
                                     }
+                                    item {
+                                        BannerAdView()
+                                    }
                                 }
 
 
 
 
                                 //last content to be placed
-                                BannerAdView()
+
                             }
                         }
                     }
