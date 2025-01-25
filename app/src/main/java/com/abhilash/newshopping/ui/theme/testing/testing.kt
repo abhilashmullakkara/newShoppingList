@@ -84,14 +84,21 @@ fun DrawerWithScaffold(navController: NavController) {
     var newtext by remember { mutableStateOf("") }
     val context = LocalContext.current
     val stringList = remember { mutableStateListOf<String>() } // Persistent list
+
     val shopDao = AppDatabase.getDatabase(context).shopDao()
-    val shopRepository = remember { ShopRepository(shopDao) }
-    val shopViewModel = remember { ShopViewModel(shopRepository) }
+
+    val itemDao = AppDatabase.getDatabase(context).itemDao()
+
+    val repository = ShopRepository(shopDao, itemDao)
+
+    val shopViewModel: ShopViewModel = viewModel(
+        factory = ShopViewModelFactory(repository)
+    )
+
     val drawerState = rememberDrawerState(DrawerValue.Closed)
      val bottomSheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden)
     val coroutineScope = rememberCoroutineScope()
     val screenWidth = LocalConfiguration.current.screenWidthDp.dp
-    val repository = ShopRepository(shopDao)
     val viewModel: ShopViewModel = viewModel(
         factory = ShopViewModelFactory(repository)
     )
@@ -107,32 +114,32 @@ fun DrawerWithScaffold(navController: NavController) {
                 Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp)
+                    .padding(7.dp)
             ) {
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(6.dp))
                     Row{
                         Text(
-                            text = "Enter a name for the list:      ",
+                            text = "Enter a name for the list/ Shop   ",
                             color = Color(0xFFB0B2D8),
                             style = MaterialTheme.typography.titleMedium
                         )
                         Button(onClick = {
                             newtext = text
+                            if(newtext.isNotEmpty()&& newtext.isNotBlank())
                             shopViewModel.insertShop(text)
-                            if (newtext.isNotEmpty()) {
+                            if (newtext.isNotEmpty() && newtext.isNotBlank()) {
                                 if (!stringList.contains(newtext)) {
                                     stringList.add(newtext) // Add new item to the list
                                 }
                             }
-                            if(newtext.isNotEmpty())
+                            else if(newtext.isNotEmpty())
                             coroutineScope.launch { bottomSheetState.hide()
                                 text = ""
-                               // newtext = ""
                             }
                             else
                                 Toast.makeText(context, "Please enter a name", Toast.LENGTH_SHORT).show()
                         }) {
-                            Text("Save List ")
+                            Text("Save")
                         }
                     }
                     Spacer(modifier = Modifier.height(8.dp))
@@ -226,7 +233,6 @@ fun DrawerWithScaffold(navController: NavController) {
                                         }
                                         HorizontalDivider()
                                         Spacer(modifier = Modifier.height(10.dp))
-                                       // Text("   $newtext", fontSize = 16.sp, color = Color.White)
                                     }
                                 }
                             }

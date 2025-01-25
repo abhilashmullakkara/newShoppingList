@@ -30,12 +30,14 @@ abstract class AppDatabase : RoomDatabase() {
                     AppDatabase::class.java,
                     "shop_database"
                 )
-                    .addMigrations(MIGRATION_1_2)  // Add migration here if necessary
+                    .addMigrations(MIGRATION_1_2)  // Add migration if necessary
+                    .fallbackToDestructiveMigration()  // Optional: Use if you want to reset data on schema mismatch
                     .build()
                 INSTANCE = instance
                 instance
             }
         }
+
     }
 }
 

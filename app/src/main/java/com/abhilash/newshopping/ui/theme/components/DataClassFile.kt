@@ -16,6 +16,7 @@ import androidx.room.Transaction
 
 data class Item(
     val name: String,   // Name of the item (e.g., rice, coriander)
+    val price: Double,  // Price of the item
     val quantity: Int? = null // Optional quantity field if needed
 )
 
@@ -43,12 +44,14 @@ data class ItemEntity(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val shopId: Int, // Foreign key to associate with ShopEntity
     val itemName: String,
-    val itemQuantity: String
+    val itemQuantity: String,
+    val itemPrice: Double
 )
 
 
 @Dao
 interface ShopDao {
+
     @Transaction
     @Query("DELETE FROM ShopEntity WHERE id = :shopId")
     suspend fun deleteShopById(shopId: Int)
@@ -76,6 +79,13 @@ interface ShopDao {
     suspend fun deleteItemByName(itemName: String)
     @Query("DELETE FROM ItemEntity")
     suspend fun deleteAllItems()
+
+    @Query("SELECT id FROM ShopEntity WHERE shopName = :shopName LIMIT 1")
+    suspend fun getShopIdByName(shopName: String): Int?
+
+
+
+
 }
 @Dao
 interface ItemDao {
@@ -86,9 +96,20 @@ interface ItemDao {
     @Query("SELECT * FROM ItemEntity WHERE shopId = :shopId")
     fun getItemsByShopId(shopId: Int): LiveData<List<ItemEntity>>
 
+    @Query("DELETE FROM ItemEntity WHERE itemName = :itemName")
+    suspend fun deleteItemByName(itemName: String)
+
     @Query("SELECT * FROM ItemEntity")
     fun getAllItems(): LiveData<List<ItemEntity>>
+
+
+    @Query("SELECT * FROM ItemEntity")
+    suspend fun getAllItemsSync(): List<ItemEntity>
+
+    @Query("SELECT * FROM ItemEntity WHERE shopId = :shopId")
+    suspend fun getItemsByShopIdSync(shopId: Int): List<ItemEntity>
 }
+
 
 
 
