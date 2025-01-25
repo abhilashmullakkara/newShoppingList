@@ -137,14 +137,14 @@ fun ListNameAndQuantityInput(
 
     val price = remember(quantity, unitPrice) {
         val qty = try {
-            quantity.toInt()
+            quantity.toDouble()
         } catch (e: NumberFormatException) {
-            0
+            0.0
         }
         val pricePerUnit = try {
-            unitPrice.toInt()
+            unitPrice.toDouble()
         } catch (e: NumberFormatException) {
-            0
+            0.0
         }
         qty * pricePerUnit
     }
@@ -259,7 +259,7 @@ fun ListNameAndQuantityInput(
                             userText,
                             listName,
                             qty.toString(),
-                            price = price.toDouble()
+                            price = price
                         )
                         onSave(userText, qty)
                         listName = ""
@@ -299,12 +299,12 @@ fun ListNameAndQuantityInput(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
-                                text = "${item.itemName} - ${item.itemQuantity} ${item.itemPrice}",
+                                text = "${item.itemName} -       ${item.itemQuantity}       ${item.itemPrice}",
                                 fontSize = 15.sp,
                                 color = Color.White,
                                 fontStyle = FontStyle.Italic,
                                 fontWeight = FontWeight.SemiBold,
-                                modifier = Modifier.weight(1f)
+                                modifier = Modifier.weight(0.8f)
                             )
                             Checkbox(
                                 checked = checkedStates[item.itemName] ?: false,
